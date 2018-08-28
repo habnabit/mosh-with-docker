@@ -1,0 +1,16 @@
+FROM ubuntu:bionic
+ADD debs /var/cache/extra-debs/
+ADD apt-keys/pubkey.asc /var/cache/extra-debs-pubkey.asc
+RUN ["apt-get", "update"]
+RUN ["apt-get", "-y", "install", "gnupg2", "daemontools", "gawk", "locales", "dumb-init"]
+RUN ["apt-mark", "auto", "gnupg2"]
+RUN ["apt-key", "add", "/var/cache/extra-debs-pubkey.asc"]
+ADD extra-debs.list /etc/apt/sources.list.d/
+RUN ["apt-get", "update"]
+RUN ["apt-get", "-y", "install", "-t", "hab", "mosh"]
+RUN ["apt-get", "-y", "autoremove", "--purge"]
+ENV TERM=xterm-256color LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+RUN ["locale-gen", "en_US.UTF-8"]
+RUN ["touch", "/tmp/mosh-key"]
+ADD run-mosh-server-interior.sh /
+ENTRYPOINT ["dumb-init", "fghack", "/run-mosh-server-interior.sh"]

@@ -1,0 +1,14 @@
+FROM mosh-server-ubuntu
+RUN ["apt-get", "-y", "install", "tmux", "zsh", "python", "gnupg2"]
+RUN ["apt-get", "-y", "install", "liblocal-lib-perl", "libmath-random-mt-perl"]
+RUN ["apt-mark", "auto", "gnupg2"]
+ADD irssi-git.list /etc/apt/sources.list.d/
+ADD irssi-git-pubkey.asc /var/cache/
+RUN ["apt-key", "add", "/var/cache/irssi-git-pubkey.asc"]
+RUN ["apt-get", "update"]
+RUN ["apt-get", "-y", "install", "irssi-git"]
+RUN ["apt-get", "-y", "autoremove", "--purge"]
+RUN ["useradd", "-m", "-s", "/bin/zsh", "mosh-user"]
+RUN ["chown", "mosh-user:", "/tmp/mosh-key"]
+USER mosh-user
+WORKDIR /home/mosh-user

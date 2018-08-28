@@ -1,0 +1,11 @@
+FROM ubuntu:bionic
+ENV DEBIAN_FRONTEND=noninteractive
+RUN ["apt-get", "update"]
+RUN ["apt-get", "-y", "upgrade"]
+RUN ["apt-get", "-y", "install", "git-buildpackage", "devscripts", "equivs", "apt-utils"]
+RUN ["useradd", "-m", "packager"]
+RUN echo "packager ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+WORKDIR /home/packager
+ADD run-deb-build.sh run-deb-packager.sh ./
+USER packager
+ENTRYPOINT ["./run-deb-build.sh"]
